@@ -1,62 +1,40 @@
 #include "monty.h"
 
 /**
- * push - Pushes an element onto the stack.
- * @stack: Double pointer to the head of the stack.
- * @line_number: Line number where the push opcode is encountered.
+ * push - Adds a new_node element to the stack.
+ * @stack: Double pointer to the top of the stack.
+ * @line_number: The number to be added to the stack.
+ *
+ * Function creates new_node stack element and adds it to the top of the stack
+ * If memory allocation fails, it prints error message and exits with
+ * status EXIT_FAILURE.
  */
+
 void push(stack_t **stack, unsigned int line_number)
 {
-	int value;
 	stack_t *new_node;
-	char *value_str = strtok(NULL, " \n\t");
+	char *n_str;
+	int n;
 
-	if (!value_str || !is_number(value_str))
+	n_str = strtok(NULL, " \n\t\r");
+	if (n_str == NULL || check_if_number(n_str) == 0)
 	{
-		fprintf(stderr, "L%u: usage: push integer\n", line_number);
-		free_stack(*stack);
+		fprintf(stderr, "L%d: usage: push integer\n", line_number);
 		exit(EXIT_FAILURE);
 	}
-
-	value = atoi(value_str);
+	n = atoi(n_str);
 
 	new_node = malloc(sizeof(stack_t));
-	if (!new_node)
+	if (new_node == NULL)
 	{
-		fprintf(stderr, "Error: malloc failed\n");
-		free_stack(*stack);
+		fprintf(stderr, "Error: malloc failed in line %u\n", line_number);
 		exit(EXIT_FAILURE);
 	}
 
-	new_node->n = value;
-	new_node->next = *stack;
+	new_node->n = n;
 	new_node->prev = NULL;
-
-	if (*stack)
+	new_node->next = *stack;
+	if (*stack != NULL)
 		(*stack)->prev = new_node;
-
 	*stack = new_node;
-}
-
-/**
- * is_number - Checks if a string represents a valid number.
- * @str: String to be checked.
- * Return: 1 if the string is a valid number, 0 otherwise.
- */
-int is_number(char *str)
-{
-	if (!str)
-		return (0);
-
-	if (*str == '-')
-		str++;
-
-	while (*str)
-	{
-		if (!isdigit(*str))
-			return (0);
-		str++;
-	}
-
-	return (1);
 }
